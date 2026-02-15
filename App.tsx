@@ -462,7 +462,6 @@ export default function App() {
                         <>
                             <View style={styles.header2}>
                                 <Text style={[tokens.textStyles.ndotHeadlineXSmall, styles.heading]}>NEXT PERIOD</Text>
-                                <Text style={[tokens.textStyles.bodySmall, styles.helper]}>Estimated start date</Text>
                             </View>
 
                             <View style={styles.resultContainer}>
@@ -486,7 +485,7 @@ export default function App() {
 
                             <Pressable style={styles.doneButton} onPress={handleReset}>
                                 <Text style={[tokens.textStyles.labelMedium, styles.doneButtonText]}>
-                                    DONE
+                                    START AGAIN
                                 </Text>
                             </Pressable>
                         </>
@@ -520,14 +519,14 @@ const styles = StyleSheet.create({
         paddingTop: 4,
     },
     screen3: {
-        paddingTop: 16,
+        paddingTop: 0,
         alignItems: 'center',
     },
     header: {
         marginBottom: 8,
     },
     header2: {
-        marginBottom: 2,
+        marginBottom: 0,
     },
     heading: {
         color: tokens.colors.light,
@@ -671,42 +670,42 @@ const styles = StyleSheet.create({
     // rangeLabels styles removed
     resultContainer: {
         alignItems: 'center',
-        marginTop: 4,
-        marginBottom: 8,
+        marginTop: 2,
+        marginBottom: 4,
     },
     resultDate: {
         color: tokens.colors.red,
-        fontSize: 36,
-        lineHeight: 36,
+        fontSize: 32,
+        lineHeight: 32,
     },
     resultMonth: {
         color: tokens.colors.light,
-        marginTop: 2,
+        marginTop: 1,
     },
     daysLeft: {
         color: tokens.colors.red,
-        marginTop: 4,
+        marginTop: 2,
     },
     fertileInfo: {
         alignItems: 'center',
-        marginBottom: 8,
+        marginBottom: 4,
     },
     fertileLabel: {
         color: tokens.colors['secondary-light'],
-        marginBottom: 2,
+        marginBottom: 1,
         fontSize: 10,
     },
     fertileValue: {
         color: tokens.colors.light,
-        fontSize: 12,
     },
     doneButton: {
         height: 24,
-        paddingHorizontal: 12,
         backgroundColor: tokens.colors['secondary-dark'],
-        borderRadius: 4,
+        paddingHorizontal: 16,
+        borderRadius: 12,
         alignItems: 'center',
         justifyContent: 'center',
+        marginTop: 2,
     },
     doneButtonText: {
         color: tokens.colors.light,
