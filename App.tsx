@@ -167,6 +167,8 @@ export default function App() {
     const [currentScreen, setCurrentScreen] = useState(1);
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [cycleLength, setCycleLength] = useState(28);
+    // Initialize 'today' state
+    const [today, setToday] = useState(new Date());
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const slideAnim = useRef(new Animated.Value(0)).current;
     const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -178,6 +180,33 @@ export default function App() {
         ovulationDate: Date;
     } | null>(null);
 
+    // Midnight Update Logic
+    const midnightTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    useEffect(() => {
+        const scheduleNext = () => {
+            const now = new Date();
+            setToday(now);
+
+            // Calculate time until next midnight
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(0, 0, 0, 0);
+
+            const delay = tomorrow.getTime() - now.getTime();
+
+            midnightTimer.current = setTimeout(scheduleNext, delay);
+        };
+
+        scheduleNext();
+
+        return () => {
+            if (midnightTimer.current) {
+                clearTimeout(midnightTimer.current);
+            }
+        };
+    }, []);
+
     useEffect(() => {
         Animated.timing(fadeAnim, {
             toValue: 1,
@@ -185,6 +214,7 @@ export default function App() {
             useNativeDriver: true,
         }).start();
     }, []);
+
 
     useEffect(() => {
         if (selectedDate && currentScreen === 1) {
@@ -283,6 +313,10 @@ export default function App() {
         if (!isCurrentMonth) return;
 
         const selected = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+
+        // Prevent future date selection
+        if (selected > today) return;
+
         setSelectedDate(selected);
     };
 
@@ -339,6 +373,16 @@ export default function App() {
                                 currentMonth.getMonth() === selectedDate.getMonth() &&
                                 currentMonth.getFullYear() === selectedDate.getFullYear();
 
+                            // Check if this date is "today"
+                            const isToday = dateObj.isCurrentMonth &&
+                                dateObj.day === today.getDate() &&
+                                currentMonth.getMonth() === today.getMonth() &&
+                                currentMonth.getFullYear() === today.getFullYear();
+
+                            // Check if date is in the future
+                            const currentDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), dateObj.day);
+                            const isFuture = currentDate > today;
+
                             return (
                                 <Pressable
                                     key={idx}
@@ -346,14 +390,18 @@ export default function App() {
                                     style={[
                                         styles.dateCell,
                                         isSelected && styles.selectedDate,
+                                        // isToday && { borderWidth: 1, borderColor: tokens.colors.red } // Optional: highlight today
+                                        isFuture && styles.disabledDate
                                     ]}
                                 >
+
                                     <Text
                                         style={[
                                             tokens.textStyles.bodySmall,
                                             styles.dateText,
                                             !dateObj.isCurrentMonth && styles.otherMonthDate,
                                             isSelected && styles.selectedDateText,
+                                            isFuture && styles.disabledDateText
                                         ]}
                                         numberOfLines={1}
                                     >
@@ -423,6 +471,9 @@ export default function App() {
                                 </Text>
                                 <Text style={[tokens.textStyles.labelMedium, styles.resultMonth]}>
                                     {monthNames[predictions.nextPeriod.getMonth()]}
+                                </Text>
+                                <Text style={[tokens.textStyles.labelSmall, styles.daysLeft]}>
+                                    {Math.ceil((predictions.nextPeriod.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))} DAYS LEFT
                                 </Text>
                             </View>
 
@@ -532,6 +583,12 @@ const styles = StyleSheet.create({
     otherMonthDate: {
         color: tokens.colors['secondary-dark'],
     },
+    disabledDate: {
+        opacity: 0.3,
+    },
+    disabledDateText: {
+        color: tokens.colors['secondary-dark'],
+    },
     selectedDateText: {
         color: tokens.colors.light,
         fontWeight: '600',
@@ -625,6 +682,10 @@ const styles = StyleSheet.create({
     resultMonth: {
         color: tokens.colors.light,
         marginTop: 2,
+    },
+    daysLeft: {
+        color: tokens.colors.red,
+        marginTop: 4,
     },
     fertileInfo: {
         alignItems: 'center',
