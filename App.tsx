@@ -137,7 +137,7 @@ function DotNumber({ value }: { value: number }) {
                                 transform: [{
                                     translateY: anims[idx] ? anims[idx].interpolate({
                                         inputRange: [-1, 0, 1],
-                                        outputRange: [20, 0, -20]
+                                        outputRange: [28, 0, -28]
                                     }) : 0
                                 }]
                             }
@@ -576,8 +576,9 @@ const styles = StyleSheet.create({
         width: 80,
     },
     digitMask: {
-        height: 20,
+        height: 28,
         overflow: 'hidden',
+        justifyContent: 'center', // Center content vertically in mask
     },
     dotNumberWrapper: {
         position: 'relative',
